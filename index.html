@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bug Tracker</title>
+  </head>
+  <body>
+    <h1>Reporte de bugs</h1>
+    <label for="title">Que Falla</label><br>
+    <input type="text" id="title" placeholder="Título del bug" />
+    <br /><br />
+    <label for="description">Como Falla</label><br>
+    <textarea id="description" placeholder="Describe el problema" rows="4" cols="50"></textarea>
+    <br /><br />
+
+    <button id="addBug">Agregar bug</button>
+
+    <ul id="bugList"></ul>
+
+    <script src="/js/app.js"></script>
+  </body>
+</html>
