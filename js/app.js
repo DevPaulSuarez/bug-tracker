@@ -1,4 +1,5 @@
 let bugs = [];
+let currentFilter = 'all';
 
 document.getElementById('addBug').addEventListener('click', () => {
   const title = document.getElementById('title').value;
@@ -38,7 +39,13 @@ function renderBugs() {
   const container = document.getElementById('bugList');
   container.innerHTML = '';
 
-  bugs.forEach(bug => {
+
+ const filteredBugs = bugs.filter(bug => {
+  if (currentFilter === 'all') return true;
+  return bug.status === currentFilter;
+  });
+
+  filteredBugs.forEach(bug => {
     const div = document.createElement('div');
     const btn = document.createElement('button');
 
@@ -62,4 +69,22 @@ function renderBugs() {
     
   });
 
+
+
+
+}
+
+document.getElementById('filterAll').onclick = () => {
+  currentFilter = 'all';
+  renderBugs();
+};
+
+document.getElementById('filterOpen').onclick = () => {
+  currentFilter = 'Open';
+  renderBugs();
+};
+
+document.getElementById('filterResolved').onclick = () => {
+  currentFilter = 'Completado';
+  renderBugs();
 }

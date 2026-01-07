@@ -7,14 +7,25 @@
   </head>
   <body>
     <h1>Reporte de bugs</h1>
-    <label for="title">Que Falla</label><br>
+    <label for="title">Que Falla</label><br />
     <input type="text" id="title" placeholder="Título del bug" />
     <br /><br />
-    <label for="description">Como Falla</label><br>
-    <textarea id="description" placeholder="Describe el problema" rows="4" cols="50"></textarea>
+    <label for="description">Como Falla</label><br />
+    <textarea
+      id="description"
+      placeholder="Describe el problema"
+      rows="4"
+      cols="50"
+    ></textarea>
     <br /><br />
 
     <button id="addBug">Agregar bug</button>
+    <br>
+    <label>Filtrar por estado</label><br />
+
+    <button id="filterAll">Todos</button>
+    <button id="filterOpen">Abiertos</button>
+    <button id="filterResolved">Resueltos</button>
 
     <ul id="bugList"></ul>
 
