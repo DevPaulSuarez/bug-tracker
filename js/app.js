@@ -1,90 +1,88 @@
-let bugs = [];
+
+
 let currentFilter = 'all';
 
+const bugListContainer = document.getElementById('bugList');
+
 document.getElementById('addBug').addEventListener('click', () => {
-  const title = document.getElementById('title').value;
-  const description = document.getElementById('description').value;
+  const title = document.getElementById('title').value.trim();
+  const description = document.getElementById('description').value.trim();
 
-  //const li = document.createElement('li');
-  //li.textContent = `${title}: ${description}`;
+  if (!title || !description) return alert('Debes poner título y descripción');
 
-  //document.getElementById('bugList').appendChild(li);
-  const now = new Date();
-  const bug = { 
-    id:Date.now(),
-    title, 
-    description,
-    status:'Open',
-    // Valores numéricos (útiles para ordenar/filtrar)
-    fecha: now.toISOString().split('T')[0],  // "2025-01-06"
-    hora: `${now.getHours()}:${now.getMinutes()}`,  // "14:35"
-    
-    // Valores de texto (para mostrar al usuario)
-    fechaTexto: now.toLocaleDateString(),    // "1/6/2025"
-    horaTexto: now.toLocaleTimeString(),     // "2:35:45 PM"
-  };
-  bugs.push(bug);
+  // POST al backend
+  fetch('http://localhost:3000/bugs', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, description })
+  })
+  .then(res => res.json())
+  .then(() => {
+    // Limpiar inputs
+    document.getElementById('title').value = '';
+    document.getElementById('description').value = '';
 
-  localStorage.setItem('bugs', JSON.stringify(bugs));
-  renderBugs();
+    // Refrescar lista de bugs desde backend
+    renderBugs();
+  })
+  .catch(err => console.error('Error creando bug:', err));
 });
 
-const savedBugs = localStorage.getItem('bugs');
-if (savedBugs) {
-  bugs = JSON.parse(savedBugs);
-  renderBugs();
-}
-
 function renderBugs() {
-  const container = document.getElementById('bugList');
-  container.innerHTML = '';
+  bugListContainer.innerHTML = '';
 
+  // GET del backend
+  fetch('http://localhost:3000/bugs')
+    .then(res => res.json())
+    .then(bugs => {
+      // Filtrar según currentFilter
+      const filteredBugs = bugs.filter(bug => {
+        if (currentFilter === 'all') return true;
+        return bug.status === currentFilter;
+      });
 
- const filteredBugs = bugs.filter(bug => {
-  if (currentFilter === 'all') return true;
-  return bug.status === currentFilter;
-  });
+      filteredBugs.forEach(bug => {
+        const div = document.createElement('div');
+        const btn = document.createElement('button');
 
-  filteredBugs.forEach(bug => {
-    const div = document.createElement('div');
-    const btn = document.createElement('button');
+        div.textContent = `${bug.title} - ${bug.description} [${bug.status}]`;
+        btn.textContent = 'Resolver';
 
-    btn.textContent = 'Resolver'
-    div.textContent = `${bug.title} - ${bug.description} -${bug.fechaTexto} ${bug.horaTexto} [${bug.status}]`;
+        if (bug.status === 'resolved') {
+          div.style.textDecoration = 'line-through';
+          btn.disabled = true;
+        }
 
-    if (bug.status === 'Completado') {
-      div.style.textDecoration = 'line-through';
-      btn.disabled = true;
-      }
+        btn.addEventListener('click', () => {
+          fetch(`http://localhost:3000/bugs/${bug.id}`, {
+            method: 'PATCH'
+          })
+          .then(() => renderBugs())
+          .catch(err => console.error('Error resolviendo bug:', err));
+        });
 
-    btn.addEventListener('click', () => {
-      bug.status = 'Completado';
-      localStorage.setItem('bugs', JSON.stringify(bugs));
-      renderBugs();
-    });
-
-    container.appendChild(div);
-    container.appendChild(btn);
-
-    
-  });
-
-
-
-
+        bugListContainer.appendChild(div);
+        bugListContainer.appendChild(btn);
+      });
+    })
+    .catch(err => console.error('Error cargando bugs:', err));
 }
 
+// Filtros
 document.getElementById('filterAll').onclick = () => {
   currentFilter = 'all';
   renderBugs();
 };
 
 document.getElementById('filterOpen').onclick = () => {
-  currentFilter = 'Open';
+  currentFilter = 'open';
   renderBugs();
 };
 
 document.getElementById('filterResolved').onclick = () => {
-  currentFilter = 'Completado';
+  currentFilter = 'resolved';
   renderBugs();
-}
+};
+
+// Al cargar la página, renderizamos bugs
+renderBugs();
