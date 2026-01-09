@@ -1,51 +1,40 @@
 const express = require('express');
 const app = express();
+const db = require('./db/database');
 
-const cors = require('cors');
-
-app.use(cors()); // permite cualquier origen
-
-// Middleware para parsear JSON
 app.use(express.json());
 
-// Array que guarda los bugs (temporal, en memoria)
-let bugs = [];
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
 
-// Obtener todos los bugs
 app.get('/bugs', (req, res) => {
-  res.json(bugs);
+  db.all('SELECT * FROM bugs ORDER BY id DESC', [], (err, rows) => {
+    if (err) return res.status(500).json(err);
+    res.json(rows);
+  });
 });
 
-// Crear un bug
 app.post('/bugs', (req, res) => {
-  // Validar que vengan los datos
-  if (!req.body.title || !req.body.description) {
-    return res.status(400).json({ error: 'Datos incompletos' });
-  }
-
-  const bug = {
-    id: Date.now(),
-    title: req.body.title,
-    description: req.body.description,
-    status: 'open' // valor inicial correcto
-  };
-  bugs.push(bug);
-  res.status(201).json(bug);
+  const { title, description } = req.body;
+  db.run(
+    'INSERT INTO bugs (title, description) VALUES (?, ?)',
+    [title, description],
+    function () {
+      res.json({ id: this.lastID, title, description, status: 'open' });
+    }
+  );
 });
 
-// Marcar un bug como resuelto
 app.patch('/bugs/:id', (req, res) => {
-  const bug = bugs.find(b => b.id == req.params.id);
-  if (!bug) return res.sendStatus(404);
-
-  bug.status = 'resolved';
-  res.json(bug);
+  db.run(
+    'UPDATE bugs SET status = "resolved" WHERE id = ?',
+    [req.params.id],
+    () => res.json({ ok: true })
+  );
 });
 
-// Evitar 404 de favicon
-app.get('/favicon.ico', (req, res) => res.sendStatus(204));
-
-// Iniciar servidor
-app.listen(3000, () => {
-  console.log('API running on http://localhost:3000');
-});
+app.listen(3000, () => console.log('Backend en http://localhost:3000'));
