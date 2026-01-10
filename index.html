@@ -1,35 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bug Tracker</title>
-  </head>
-  <body>
-    <h1>Reporte de bugs</h1>
-    <label for="title">Que Falla</label><br />
-    <input type="text" id="title" placeholder="Título del bug" />
-    <br /><br />
-    <label for="description">Como Falla</label><br />
-    <textarea
-      id="description"
-      placeholder="Describe el problema"
-      rows="4"
-      cols="50"
-    ></textarea>
-    <br /><br />
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bug Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
-    <button id="addBug">Agregar bug</button>
-    <br>
-    <label>Filtrar por estado</label><br />
+  <div class="container">
+    <h1>Bug Tracker</h1>
 
-    <button id="filterAll">Todos</button>
-    <button id="filterOpen">Abiertos</button>
-    <button id="filterResolved">Resueltos</button>
+    <div class="form">
+      <label>¿Qué falla?</label>
+      <input type="text" id="title" placeholder="Título del bug" />
 
-    <ul id="bugList"></ul>
+      <label>¿Cómo falla?</label>
+      <textarea id="description" placeholder="Describe el problema"></textarea>
 
-    <script src="/js/app.js"></script>
-    
-  </body>
+      <button id="addBug">Agregar bug</button>
+    </div>
+
+    <div class="filters">
+      <span>Filtrar:</span>
+      <button id="filterAll">Todos</button>
+      <button id="filterOpen">Abiertos</button>
+      <button id="filterResolved">Resueltos</button>
+    </div>
+
+    <div id="bugList" class="bug-list"></div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
 </html>
